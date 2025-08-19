@@ -2,7 +2,6 @@ let dishPrompt = document.querySelector("#prompt");
 let chatContainer = document.querySelector(".chat-container");
 
 
-
 function createChatBox(html,classes){
     let div = document.createElement("div");
     div.innerHTML = html;
@@ -23,7 +22,7 @@ function handleChatResponse(message){
 
         let aiChatBox = createChatBox(html,"ai-chat-box");
         chatContainer.appendChild(aiChatBox);
-        let response = await generateResponse(message);
+        let response = generateResponse(message);
         console.log(response);
 
     },600);
