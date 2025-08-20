@@ -3,11 +3,11 @@ let chatContainer = document.querySelector(".chat-container");
 
 async function getRecipe(prompt) {
     try {
-        let response = await fetch("https://your-render-url.onrender.com/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt })
-    });
+        let response = await fetch("http://localhost:5000/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt })
+        });
 
         let data = await response.json();
         return data.recipe;   
