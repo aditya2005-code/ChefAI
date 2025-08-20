@@ -3,9 +3,10 @@ from flask_cors import CORS
 from boltiotai import openai
 import sys
 import traceback
+import os
 
 # Set API key
-openai.api_key = "hhzxHHvNXrTbsniErJNg7lMx56NZZBaa0FdED8FRLa4"
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 if openai.api_key == "":
     sys.stderr.write("API key missing. Please set it up properly.\n")
