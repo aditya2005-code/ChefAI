@@ -1,23 +1,18 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from boltiotai import openai
-import os
 import sys
+import traceback
 
+# Set API key
 openai.api_key = "hhzxHHvNXrTbsniErJNg7lMx56NZZBaa0FdED8FRLa4"
+
 if openai.api_key == "":
-  sys.stderr.write("""
-  You haven't set up your API key yet.
-  
-  If you don't have an API key yet, visit:
-  
-  https://platform.openai.com/signup
+    sys.stderr.write("API key missing. Please set it up properly.\n")
+    exit(1)
 
-  1. Make an account or sign in
-  2. Click "View API Keys" from the top right menu.
-  3. Click "Create new secret key"
-
-  Then, open the Secrets Tool and add OPENAI_API_KEY as a secret.
-  """)
-  exit(1)
+app = Flask(__name__)
+CORS(app)
 
 system_prompt = """
 **Role:** You are an experienced Indian Master Chef and culinary expert, renowned for your authentic and easy-to-follow Indian recipes.
@@ -41,25 +36,38 @@ system_prompt = """
 *   **Novelty:** You may include a brief, interesting historical fact about the dish or a regional variation tip, if applicable, to enrich the recipe without distracting from the primary instructions.
 """
 
+@app.route('/generate', methods=['POST'])
+def generate_recipe():
+    try:
+        data = request.json
+        question = data.get("prompt", "").strip()
 
-# Read the input once
-with open('input.txt', 'r') as file:
-    question = file.read().strip()
+        if not question:
+            return jsonify({"error": "No dish provided"}), 400
 
-if question == "":
-    sys.exit("No input provided.")
+        #  Call GPT model (boltiotai wrapper)
+        response = response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": question}
+            ]
+        )
 
-# Generate response
-response = openai.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": question}
-    ]
-)
+        print("RAW RESPONSE:", response) 
 
-output = response['choices'][0]['message']['content']
+        # Extract output safely
+        output  = response['choices'][0]['message']['content']
 
-# Write output to file for Node.js to read
-with open('output.txt', 'w', encoding='utf-8') as file:
-    file.write(output)
+        if not output:
+            return jsonify({"error": "No response from AI"}), 500
+
+        return jsonify({"recipe": output})
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
