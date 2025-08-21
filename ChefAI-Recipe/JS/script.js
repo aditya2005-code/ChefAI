@@ -15,6 +15,7 @@ async function getRecipe(prompt) {
         console.error("Error:", error);
         return "⚠️ Error connecting to server.";
     }
+    
 }
 
 
@@ -50,6 +51,10 @@ async function handleChatResponse(message) {
 
     // Replace loading dots with actual response which is converted into markdown
     aiChatBox.querySelector(".ai-chat-area").innerText = response;
+    chatContainer.scrollTo({
+        top: chatContainer.scrollHeight,
+        behavior: "smooth"
+    });
 }
 
 dishPrompt.addEventListener("keydown", (e) => {
