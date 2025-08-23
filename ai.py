@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from boltiotai import openai
 import sys
@@ -12,7 +12,7 @@ if openai.api_key == "":
     sys.stderr.write("API key missing. Please set it up properly.\n")
     exit(1)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="ChefAI-Recipe")
 CORS(app)
 
 system_prompt = """
@@ -72,11 +72,11 @@ def generate_recipe():
 
 @app.route('/')
 def serve_index():
-    return send_from_directory('HTML', 'index.html')
+    return send_from_directory('ChefAI-Recipe', 'index.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
-    return send_from_directory('HTML', path)
+    return send_from_directory('ChefAI-Recipe', path)
 
 # --- Run app ---
 if __name__ == '__main__':
